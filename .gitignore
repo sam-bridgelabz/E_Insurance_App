@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+.venv/
+
+# Environment variables
+.env
+*.env
+
+# SQLite DB files
+*.sqlite3
+*.db
+*.sqlite
+
+# Alembic migration logs
+alembic/versions/
+
+# IDE/editor-specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Python tool caches
+.mypy_cache/
+.pytest_cache/
+coverage/
+.tox/
+.cache/
+
+# Log files
+*.log
+
+# OS/system files
+.DS_Store
+Thumbs.db
+
+# PDF Receipts or Generated Media
+receipts/
+*.pdf
+
+# Test output
+htmlcov/
+test-results/
+
+# Build / dist
+build/
+dist/
+*.egg-info/
