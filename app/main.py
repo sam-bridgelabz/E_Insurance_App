@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from core.app_config import get_host_ip_address_n_port
+from app.core.app_config import get_host_ip_address_n_port
 
 
 
@@ -40,7 +40,7 @@ def run_web_mode():
         host_port_number = int(host_port_number_str)
 
         uvicorn.run(
-            "main:app", host=host_ip_address, port=host_port_number
+            "app.main:app", host=host_ip_address, port=host_port_number
         )
     except Exception as e:
         print(f"Error occurred: {e}")
