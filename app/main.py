@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.app_config import get_host_ip_address_n_port
+from app.config.load_config import api_settings
 
 
 
@@ -36,8 +36,8 @@ def run_web_mode():
     try:
         import uvicorn
 
-        host_ip_address, host_port_number_str = get_host_ip_address_n_port()
-        host_port_number = int(host_port_number_str)
+        host_ip_address = api_settings.HOST_IP_ADDRESS
+        host_port_number = api_settings.HOST_PORT_NUMBER
 
         uvicorn.run(
             "app.main:app", host=host_ip_address, port=host_port_number
