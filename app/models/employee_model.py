@@ -1,15 +1,18 @@
 from datetime import datetime
-from typing import List
+from typing import List, TYPE_CHECKING
 
-from database import Base
+from app.db.base import Base
+
 from sqlalchemy import Date
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import ForeignKey, String, event, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.admin_model import Admin
-from app.models.agent_model import Agent
 from app.utils.department_enum import DepartmentEnum
+
+if TYPE_CHECKING:
+    from app.models.admin_model import Admin
+    from app.models.agent_model import Agent
 
 
 class Employee(Base):
@@ -23,7 +26,7 @@ class Employee(Base):
     dept: Mapped[DepartmentEnum] = mapped_column(
         SQLAlchemyEnum(DepartmentEnum), nullable=False
     )
-    doj: Mapped[Date] = mapped_column(default=datetime.now)
+    doj: Mapped[datetime] = mapped_column(default=datetime.now)
 
     admin: Mapped["Admin"] = relationship("Admin", back_populates="employees")
     agents: Mapped[List["Agent"]] = relationship(

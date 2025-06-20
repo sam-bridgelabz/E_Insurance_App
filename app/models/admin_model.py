@@ -1,12 +1,14 @@
 from datetime import datetime
-from typing import List
+from typing import List, TYPE_CHECKING
 
-from database import Base
-from sqlalchemy import Date, Integer, String, cast, event, select
+from app.db.base import Base
+from sqlalchemy import  Integer, String, cast, event, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import text
 
-from app.models.employee_model import Employee
+
+if TYPE_CHECKING:
+    from app.models.employee_model import Employee
 
 
 class Admin(Base):
@@ -18,11 +20,12 @@ class Admin(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
-    created_at: Mapped[Date] = mapped_column(default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
     employees: Mapped[List["Employee"]] = relationship(
         "Employee", back_populates="admin", cascade="all, delete-orphan"
     )
+
 
 
 @event.listens_for(Admin, "before_insert")

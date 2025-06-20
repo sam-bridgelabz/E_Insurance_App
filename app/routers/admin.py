@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.config.logger_config import func_logger
-from app.database import get_db
+from app.db.session import get_db
 from app.models import admin_model
 from app.schemas import admin_schema
 from app.utils.hash_password import Hash

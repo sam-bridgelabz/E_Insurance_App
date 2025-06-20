@@ -1,9 +1,10 @@
 from sqlalchemy import ForeignKey, String, event, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import TYPE_CHECKING
+from app.db.base import Base
 
-from app.database import Base
-from app.models.employee_model import Employee
-
+if TYPE_CHECKING:
+    from app.models.employee_model import Employee
 
 class Agent(Base):
     __tablename__ = "agents"
