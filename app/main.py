@@ -1,4 +1,3 @@
-
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.load_config import api_settings
 from app.f_api import f_api
@@ -13,10 +12,15 @@ f_api.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Health check
 @f_api.get("/", tags=["Root"])
 def read_root():
-    return {"message": "running", "payload": "Welcome to E-Insurance API","satus_code": 200}
+    return {
+        "message": "running",
+        "payload": "Welcome to E-Insurance API",
+        "satus_code": 200,
+    }
 
 
 def run_web_mode():

@@ -3,6 +3,7 @@ import os
 
 from loguru import logger
 
+
 class Logger:
     @staticmethod
     def initialize_from_json(config_path="logger_format.json"):
@@ -20,15 +21,13 @@ class Logger:
 
         for handler in config_log["handlers"]:
             filter_name = handler.pop("filter", None)
-            filter_func = {
-                "config": db_filter,
-                "func": func_filter
-            }.get(filter_name)
+            filter_func = {"config": db_filter, "func": func_filter}.get(filter_name)
 
             logger.add(**handler, filter=filter_func)
 
         logger.info("Logger initialized from JSON config.")
         return logger
+
 
 logger_config = Logger.initialize_from_json()
 config_logger = logger_config.bind(config=True)
