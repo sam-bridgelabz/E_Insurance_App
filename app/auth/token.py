@@ -4,7 +4,6 @@ from app.config.logger_config import func_logger
 from app.schemas.token_schema import TokenData
 from jose import JWTError, jwt
 
-
 class AccessToken:
     def __init__(self, algorithm="HS256", time_expire=30, secret_key=None):
         self.algorithm = algorithm

@@ -1,16 +1,17 @@
 from app.auth.oauth2 import get_current_user
-from app.auth.token import AccessToken
-from app.config.settings import authSettings
-from app.db.session import get_db
-from app.models import admin_model, agent_model, employee_model
+from app.config.load_config import api_settings
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import SQLAlchemyError
+from app.auth.token import AccessToken
+from app.db.session import get_db
+from app.models import admin_model, employee_model, agent_model
+from app.exceptions.orm import (
+    InvalidCredentialsException,
+    TokenCreationError,
+    DatabaseIntegrityError,
+)
 from sqlalchemy.orm import Session
-from app.schemas.token_schema import TokenData
-from app.utils.exceptions import (DatabaseIntegrityError,
-                                InvalidCredentialsException,
-                                TokenCreationError)
 from app.utils.hash_password import Hash
 from app.schemas.admin_schema import ShowAdmin
 
@@ -25,7 +26,7 @@ def get_user(db: Session = Depends(get_db), current_user=Depends(get_current_use
 
 @login_router.post("/auth/login")
 def login(
-    request: OAuth2PasswordRequestForm=Depends(), db: Session = Depends(get_db)
+    request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     try:
         email = request.username
@@ -45,7 +46,7 @@ def login(
             raise InvalidCredentialsException()
 
         try:
-            token_obj = AccessToken(time_expire=30, secret_key=authSettings.SECRET_KEY)
+            token_obj = AccessToken(time_expire=30, secret_key=api_settings.SECRET_KEY)
             access_token = token_obj.create_access_token(
                 data={
                     "sub": str(user.id),
@@ -54,7 +55,7 @@ def login(
             return {"access_token": access_token, "token_type": "bearer"}
 
         except Exception:
-            raise TokenCreationError(detail="Failed to generate authentication token")
+            raise TokenCreationError()
 
     except SQLAlchemyError as e:
         raise DatabaseIntegrityError(detail=f"Database error during login, {e}")
