@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
-
 from app.config.logger_config import config_logger
+from app.routes import admin, agent, employee, auth
+from fastapi import FastAPI
 
 
 @asynccontextmanager
@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
     print("🙏 App shutting down...")
 
 
-#App metadata
+# App metadata
 f_api = FastAPI(
     title="E-Insurance Management System",
     description="A role-based insurance system built with FastAPI.",
@@ -26,7 +26,13 @@ f_api = FastAPI(
     contact={
         "name": "Monocept Team",
         "url": "https://github.com/sam-bridgelabz/E_Insurance_App",
-        "email": "sam.varghese@bridgelabz.com"
+        "email": "sam.varghese@bridgelabz.com",
     },
-    lifespan=lifespan
+    lifespan=lifespan,
 )
+
+
+f_api.include_router(auth.login_router)
+f_api.include_router(admin.admin_router)
+f_api.include_router(agent.agent_router)
+f_api.include_router(employee.employee_router)

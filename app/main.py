@@ -1,8 +1,6 @@
-from fastapi.middleware.cors import CORSMiddleware
 from app.config.load_config import api_settings
 from app.f_api import f_api
-
-
+from fastapi.middleware.cors import CORSMiddleware
 
 f_api.add_middleware(
     CORSMiddleware,
@@ -30,9 +28,7 @@ def run_web_mode():
         host_ip_address = api_settings.HOST_IP_ADDRESS
         host_port_number = api_settings.HOST_PORT_NUMBER
 
-        uvicorn.run(
-            "app.f_api:f_api", host=host_ip_address, port=host_port_number
-        )
+        uvicorn.run("app.f_api:f_api", host=host_ip_address, port=host_port_number)
     except Exception as e:
         print(f"Error occurred: {e}")
 

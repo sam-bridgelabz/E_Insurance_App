@@ -1,14 +1,12 @@
 from datetime import datetime
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from app.db.base import Base
-
+from app.utils.department_enum import DepartmentEnum
 from sqlalchemy import Date
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import ForeignKey, String, event, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.utils.department_enum import DepartmentEnum
 
 if TYPE_CHECKING:
     from app.models.admin_model import Admin

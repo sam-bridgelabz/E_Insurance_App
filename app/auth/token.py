@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta, timezone
-from jose import JWTError, jwt
+
 from app.config.logger_config import func_logger
-from app.schema.token_schema import TokenData
+from app.schemas.token_schema import TokenData
+from jose import JWTError, jwt
 
 
 class AccessToken:

@@ -1,17 +1,15 @@
+from app.auth.token import AccessToken
+from app.config.logger_config import func_logger
+from app.config.settings import authSettings
+from app.db.session import get_db
+from app.models import admin_model, agent_model, employee_model
+from app.utils.exceptions import credentials_exception
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-from app.utils.exceptions import credentials_exception
-from app.config.logger_config import func_logger
-from app.models import admin_model, employee_model, agent_model
-from app.auth.token import AccessToken
-from app.config.settings import authSettings
 
-
-from database import get_db
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def get_current_user(

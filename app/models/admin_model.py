@@ -1,11 +1,10 @@
 from datetime import datetime
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from app.db.base import Base
-from sqlalchemy import  Integer, String, cast, event, select
+from sqlalchemy import Integer, String, cast, event, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import text
-
 
 if TYPE_CHECKING:
     from app.models.employee_model import Employee
@@ -25,7 +24,6 @@ class Admin(Base):
     employees: Mapped[List["Employee"]] = relationship(
         "Employee", back_populates="admin", cascade="all, delete-orphan"
     )
-
 
 
 @event.listens_for(Admin, "before_insert")

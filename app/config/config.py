@@ -1,6 +1,5 @@
-from pydantic import  PostgresDsn
+from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 
 class DBSettings(BaseSettings):
@@ -17,7 +16,6 @@ class DBSettings(BaseSettings):
     POSTGRESQL_PORT: int
     POSTGRESQL_DATABASE: str
 
-
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
         return PostgresDsn.build(
@@ -26,7 +24,7 @@ class DBSettings(BaseSettings):
             password=self.POSTGRESQL_PASSWORD,
             host=self.POSTGRESQL_SERVER,
             port=self.POSTGRESQL_PORT,
-            path=self.POSTGRESQL_DATABASE
+            path=self.POSTGRESQL_DATABASE,
         )
 
 

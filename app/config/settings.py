@@ -1,8 +1,7 @@
 import os
 
-from dotenv import load_dotenv
-
 from app.utils.exceptions import RequiredEnvVarError
+from dotenv import load_dotenv
 
 load_dotenv()
 
