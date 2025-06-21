@@ -14,12 +14,13 @@ agent_router = APIRouter(prefix="/agent", tags=["Agent"])
 
 
 @agent_router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=agent_schema.ShowAgent
+    "/", status_code=status.HTTP_201_CREATED,
+    response_model=agent_schema.ShowAgent
 )
 def create_agent(
-    request: agent_schema.CreateAgent,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(employee_required),
+        request: agent_schema.CreateAgent,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(employee_required),
 ):
     func_logger.info("POST /agent - Create new Agent!")
 
@@ -53,15 +54,18 @@ def create_agent(
         db.rollback()
         func_logger.error("❌ Database error during agent creation!")
         raise HTTPException(
-            status_code=500, detail="Internal Server Error during agent creation"
+            status_code=500,
+            detail="Internal Server Error during agent creation"
         )
 
 
 @agent_router.get(
-    "/", status_code=status.HTTP_200_OK, response_model=List[agent_schema.ShowAgent]
+    "/", status_code=status.HTTP_200_OK,
+    response_model=List[agent_schema.ShowAgent]
 )
 def get_all_agents(
-    db: Session = Depends(get_db), current_user: dict = Depends(employee_required)
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(employee_required)
 ):
     func_logger.info("GET /agent - Get list of Agents!")
     agents = db.query(agent_model.Agent).all()
@@ -70,12 +74,13 @@ def get_all_agents(
 
 @agent_router.get("/{id}", status_code=status.HTTP_200_OK)
 def get_agent_by_id(
-    id: str,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(employee_required),
+        id: str,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(employee_required),
 ):
     func_logger.info(f"GET /agent/{id} - Get Agent Details!")
-    agent = db.query(agent_model.Agent).filter(agent_model.Agent.id == id).first()
+    agent = db.query(agent_model.Agent).filter(
+        agent_model.Agent.id == id).first()
 
     if not agent:
         func_logger.error(f"❌The agent is not present: {id}")
@@ -89,10 +94,10 @@ def get_agent_by_id(
 
 @agent_router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update_agent(
-    id: str,
-    request: agent_schema.UpdateAgent,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(employee_required),
+        id: str,
+        request: agent_schema.UpdateAgent,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(employee_required),
 ):
     func_logger.info(f"PUT /agent/{id} - Update Agent Details!")
 
@@ -108,7 +113,8 @@ def update_agent(
         update_data = request.model_dump(exclude_unset=True)
 
         if "password" in update_data:
-            update_data["password"] = Hash.get_hash_password(update_data["password"])
+            update_data["password"] = Hash.get_hash_password(
+                update_data["password"])
 
         agent.update(update_data)
         db.commit()
@@ -130,9 +136,9 @@ def update_agent(
 
 @agent_router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_agent(
-    id: str,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(employee_required),
+        id: str,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(employee_required),
 ):
     func_logger.info(f"DELETE /agent/{id} - Delete Agent!")
     try:

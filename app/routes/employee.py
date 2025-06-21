@@ -19,9 +19,9 @@ employee_router = APIRouter(prefix="/employee", tags=["Employee"])
     response_model=employee_schema.ShowEmployee,
 )
 def create_employee(
-    request: employee_schema.CreateEmployee,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(admin_required),
+        request: employee_schema.CreateEmployee,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required),
 ):
     func_logger.info("POST /employee - Create new Employee!")
 
@@ -55,7 +55,8 @@ def create_employee(
         db.rollback()
         func_logger.error("❌ Database error during employee creation!")
         raise HTTPException(
-            status_code=500, detail="Internal Server Error during employee creation"
+            status_code=500,
+            detail="Internal Server Error during employee creation"
         )
 
 
@@ -65,7 +66,8 @@ def create_employee(
     response_model=List[employee_schema.ShowEmployee],
 )
 def get_all_employees(
-    db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required)
 ):
     func_logger.info("GET /employee - Get list of Employees!")
     employees = db.query(employee_model.Employee).all()
@@ -74,7 +76,8 @@ def get_all_employees(
 
 @employee_router.get("/{id}", status_code=status.HTTP_200_OK)
 def get_employee_by_id(
-    id: str, db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
+        id: str, db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"GET /employee/{id} - Get Employee Details!")
     emp = (
@@ -95,15 +98,16 @@ def get_employee_by_id(
 
 @employee_router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update_employee(
-    id: str,
-    request: employee_schema.UpdateEmployee,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(admin_required),
+        id: str,
+        request: employee_schema.UpdateEmployee,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required),
 ):
     func_logger.info(f"PUT /employee/{id} - Update Employee Details!")
 
     try:
-        emp = db.query(employee_model.Employee).filter(employee_model.Employee.id == id)
+        emp = db.query(employee_model.Employee).filter(
+            employee_model.Employee.id == id)
         if not emp.first():
             func_logger.error(f"❌The employee is not present: {id}")
             raise HTTPException(
@@ -114,7 +118,8 @@ def update_employee(
         update_data = request.model_dump(exclude_unset=True)
 
         if "password" in update_data:
-            update_data["password"] = Hash.get_hash_password(update_data["password"])
+            update_data["password"] = Hash.get_hash_password(
+                update_data["password"])
 
         emp.update(update_data)
         db.commit()
@@ -136,11 +141,13 @@ def update_employee(
 
 @employee_router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_employee(
-    id: str, db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
+        id: str, db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"DELETE /employee/{id} - Delete Employee!")
     try:
-        emp = db.query(employee_model.Employee).filter(employee_model.Employee.id == id)
+        emp = db.query(employee_model.Employee).filter(
+            employee_model.Employee.id == id)
 
         if not emp.first():
             func_logger.error(f"❌The employee is not present: {id}")

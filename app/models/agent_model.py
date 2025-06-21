@@ -14,7 +14,8 @@ class Agent(Base):
     id: Mapped[str] = mapped_column(String(20), primary_key=True)
     emp_id: Mapped[str] = mapped_column(String(20), ForeignKey("employees.id"))
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=False,
+                                       unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
 
     emp: Mapped["Employee"] = relationship("Employee", back_populates="agents")

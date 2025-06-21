@@ -17,7 +17,8 @@ class Admin(Base):
         String(20), primary_key=True, nullable=False, unique=True
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=False,
+                                       unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 

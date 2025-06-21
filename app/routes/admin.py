@@ -14,12 +14,13 @@ admin_router = APIRouter(prefix="/admin", tags=["Admin"])
 
 
 @admin_router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=admin_schema.ShowAdmin
+    "/", status_code=status.HTTP_201_CREATED,
+    response_model=admin_schema.ShowAdmin
 )
 def create_admin(
-    request: admin_schema.CreateAdmin,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(admin_required)
+        request: admin_schema.CreateAdmin,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required)
 ):
     func_logger.info("POST /admin - Create new Admin!")
 
@@ -56,22 +57,27 @@ def create_admin(
 
 
 @admin_router.get(
-    "/", status_code=status.HTTP_200_OK, response_model=List[admin_schema.ShowAdmin]
+    "/", status_code=status.HTTP_200_OK,
+    response_model=List[admin_schema.ShowAdmin]
 )
 def get_all_admins(
-    db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required)
 ):
     func_logger.info("GET /admin - Get list of Admins!")
     admins = db.query(admin_model.Admin).all()
     return admins
 
 
-@admin_router.get("/{id}", status_code=status.HTTP_200_OK, response_model=admin_schema.ShowAdmin)
+@admin_router.get("/{id}", status_code=status.HTTP_200_OK,
+                  response_model=admin_schema.ShowAdmin)
 def get_admin_by_id(
-    id: str, db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
+        id: str, db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"GET /admin/{id} - Get Admin Details!")
-    admin = db.query(admin_model.Admin).filter(admin_model.Admin.id == id).first()
+    admin = db.query(admin_model.Admin).filter(
+        admin_model.Admin.id == id).first()
 
     if not admin:
         func_logger.error(f"❌The admin is not present: {id}")
@@ -82,11 +88,12 @@ def get_admin_by_id(
 
     return admin
 
+
 @admin_router.put("/", status_code=status.HTTP_202_ACCEPTED)
 def update_admin(
-    request: admin_schema.UpdateAdmin,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+        request: admin_schema.UpdateAdmin,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(get_current_user),
 ):
     func_logger.info(f"PUT /admin/- Update Admin Details!")
 
@@ -98,7 +105,8 @@ def update_admin(
 
     try:
         id = current_user["user"].id
-        admin = db.query(admin_model.Admin).filter(admin_model.Admin.id == id).first()
+        admin = db.query(admin_model.Admin).filter(
+            admin_model.Admin.id == id).first()
 
         if not admin:
             func_logger.error(f"❌The admin is not present: {id}")
@@ -112,7 +120,8 @@ def update_admin(
         if "email" in update_data:
             existing_admin = (
                 db.query(admin_model.Admin)
-                .filter(admin_model.Admin.email == update_data["email"], admin_model.Admin.id != id)
+                .filter(admin_model.Admin.email == update_data["email"],
+                        admin_model.Admin.id != id)
                 .first()
             )
             if existing_admin:
@@ -122,7 +131,8 @@ def update_admin(
                 )
 
         if "password" in update_data:
-            update_data["password"] = Hash.get_hash_password(update_data["password"])
+            update_data["password"] = Hash.get_hash_password(
+                update_data["password"])
 
         for key, value in update_data.items():
             setattr(admin, key, value)
@@ -144,9 +154,11 @@ def update_admin(
             detail="Error occurred in Database during update.",
         )
 
+
 @admin_router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_admin(
-    id: str, db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
+        id: str, db: Session = Depends(get_db),
+        current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"DELETE /admin/{id} - Delete Admin Details!")
     try:
