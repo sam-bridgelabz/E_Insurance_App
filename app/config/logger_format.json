@@ -2,7 +2,7 @@
     "handler":[
         {
             "sink": "app/logs/config_log.log",
-            "format": "{level<:6} | {time:YYYY-MM-DD} | {name:<20} | {line} | {message}",
+            "format": "{level:<6} | {time:YYYY-MM-DD} | {name:<20} | {line} | {message}",
             "rotation": "1 MB",
             "compression": "zip",
             "backtrace": false,
@@ -12,7 +12,7 @@
         },
         {
             "sink": "app/logs/func_log.log",
-            "format": "{level<:6} | {time:YYYY-MM-DD} | {name:<20} | {line} | {message}",
+            "format": "{level:<6} | {time:YYYY-MM-DD} | {name:<20} | {line} | {message}",
             "rotation": "1 MB",
             "compression": "zip",
             "backtrace": false,

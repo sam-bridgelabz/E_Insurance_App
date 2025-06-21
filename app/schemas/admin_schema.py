@@ -23,8 +23,8 @@ class ShowAdmin(AdminSchema):
 
 
 class UpdateAdmin(BaseModel):
-    name: Optional[str]
-    email: Optional[str]
-    password: Optional[str]
-
+    name: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
+

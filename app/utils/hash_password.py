@@ -11,5 +11,3 @@ class Hash:
     @staticmethod
     def get_hash_password(password: str):
         return Hash.pwd_context.hash(password)
-
-print(Hash.get_hash_password("password"))

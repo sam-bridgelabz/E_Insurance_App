@@ -1,6 +1,6 @@
 from typing import List
 
-from app.auth.role_checker import admin_required
+from app.auth.role_checker import admin_required, get_current_user
 from app.config.logger_config import func_logger
 from app.db.session import get_db
 from app.models import admin_model
@@ -66,7 +66,7 @@ def get_all_admins(
     return admins
 
 
-@admin_router.get("/{id}", status_code=status.HTTP_200_OK)
+@admin_router.get("/{id}", status_code=status.HTTP_200_OK, response_model=admin_schema.ShowAdmin)
 def get_admin_by_id(
     id: str, db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
 ):
@@ -82,19 +82,25 @@ def get_admin_by_id(
 
     return admin
 
-
-@admin_router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
+@admin_router.put("/", status_code=status.HTTP_202_ACCEPTED)
 def update_admin(
-    id: str,
     request: admin_schema.UpdateAdmin,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(admin_required),
+    current_user: dict = Depends(get_current_user),
 ):
-    func_logger.info(f"PUT /admin/{id} - Update Admin Details!")
+    func_logger.info(f"PUT /admin/- Update Admin Details!")
+
+    if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You aren't allowed to make changes here!"
+        )
 
     try:
-        admin = db.query(admin_model.Admin).filter(admin_model.Admin.id == id)
-        if not admin.first():
+        id = current_user["user"].id
+        admin = db.query(admin_model.Admin).filter(admin_model.Admin.id == id).first()
+
+        if not admin:
             func_logger.error(f"❌The admin is not present: {id}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -103,13 +109,28 @@ def update_admin(
 
         update_data = request.model_dump(exclude_unset=True)
 
+        if "email" in update_data:
+            existing_admin = (
+                db.query(admin_model.Admin)
+                .filter(admin_model.Admin.email == update_data["email"], admin_model.Admin.id != id)
+                .first()
+            )
+            if existing_admin:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email is already in use by another admin.",
+                )
+
         if "password" in update_data:
             update_data["password"] = Hash.get_hash_password(update_data["password"])
 
-        admin.update(update_data)
-        db.commit()
+        for key, value in update_data.items():
+            setattr(admin, key, value)
 
-        func_logger.info(f"Admin updated successfully: {id}")
+        db.commit()
+        db.refresh(admin)
+
+        func_logger.info(f"✅ Admin updated successfully: {id}")
         return {
             "message": f"Admin updated successfully: {id}",
             "status": status.HTTP_202_ACCEPTED,
@@ -122,7 +143,6 @@ def update_admin(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error occurred in Database during update.",
         )
-
 
 @admin_router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_admin(

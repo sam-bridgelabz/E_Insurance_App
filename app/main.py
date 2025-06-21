@@ -28,7 +28,7 @@ def run_web_mode():
         host_ip_address = api_settings.HOST_IP_ADDRESS
         host_port_number = api_settings.HOST_PORT_NUMBER
 
-        uvicorn.run("app.f_api:f_api", host=host_ip_address, port=host_port_number)
+        uvicorn.run("app.f_api:f_api", host=host_ip_address, port=host_port_number, reload=True)
     except Exception as e:
         print(f"Error occurred: {e}")
 

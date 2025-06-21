@@ -33,6 +33,7 @@ f_api = FastAPI(
 
 
 f_api.include_router(auth.login_router)
+f_api.include_router(auth.user_router)
 f_api.include_router(admin.admin_router)
-f_api.include_router(agent.agent_router)
 f_api.include_router(employee.employee_router)
+f_api.include_router(agent.agent_router)

@@ -12,18 +12,15 @@ from app.utils.exceptions import (DatabaseIntegrityError,
                                 InvalidCredentialsException,
                                 TokenCreationError)
 from app.utils.hash_password import Hash
+from app.schemas.admin_schema import ShowAdmin
 
 user_router = APIRouter(tags=["User"])
 login_router = APIRouter(tags=["Login"])
 
 
-@user_router.get("/me")
+@user_router.get("/me", response_model=ShowAdmin)
 def get_user(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    return {
-        "message": "Current user details",
-        "payload": current_user,
-        "status_code": 200,
-    }
+    return current_user["user"]
 
 
 @login_router.post("/auth/login")

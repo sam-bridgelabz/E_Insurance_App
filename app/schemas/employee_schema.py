@@ -27,9 +27,9 @@ class ShowEmployee(EmpSchema):
 
 
 class UpdateEmployee(BaseModel):
-    name: Optional[str]
-    email: Optional[str]
-    dept: Optional[DepartmentEnum]
-    password: Optional[str]
+    name: Optional[str] = None
+    email: Optional[str] = None
+    dept: Optional[DepartmentEnum] = None
+    password: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
