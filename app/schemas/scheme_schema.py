@@ -14,7 +14,7 @@ class SchemeCreate(BaseModel):
 
 class SchemeRead(SchemeCreate):
     id: str
-    created_by: Optional[int]
+    created_by: Optional[str]
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
