@@ -13,6 +13,11 @@ class SchemeAlreadyExists(HTTPException):
         super().__init__(status_code=status_code, detail=detail)
 
 
+class PolicyAlreadyExists(HTTPException):
+    def __init__(self, status_code: int = status.HTTP_409_CONFLICT,
+                 detail: str = "Plan already exists"):
+        super().__init__(status_code=status_code, detail=detail)
+
 class UnauthorizedAccess(HTTPException):
     def __init__(self, status_code: int = status.HTTP_403_FORBIDDEN,
                  detail: str = "Access denied"):
@@ -51,3 +56,25 @@ class DatabaseIntegrityError(HTTPException):
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=detail or "Database integrity error occurred",
         )
+
+class ExpiryDateError(HTTPException):
+    def __init__(self, status_code, detail = None, headers = None):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Expiry date must be after start date.", 
+        )
+    
+class ZeroAmountError(HTTPException):
+    def __init__(self, status_code, detail = None, headers = None):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Premium amount must be greater than 0.", 
+        )
+    
+class PolicyNotFound(HTTPException):
+    def __init__(self, status_code, detail = None, headers = None):
+        super().__init__(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Policy Not Found", 
+        )
+    

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from app.db.base import Base
 from sqlalchemy import ForeignKey, String, event, text
@@ -19,6 +19,7 @@ class Agent(Base):
     password: Mapped[str] = mapped_column(String(100), nullable=False)
 
     emp: Mapped["Employee"] = relationship("Employee", back_populates="agents")
+    policies: Mapped[List["Policy"]] = relationship("Policy", back_populates="agent", cascade="all, delete-orphan")
     
 
 @event.listens_for(Agent, "before_insert")
