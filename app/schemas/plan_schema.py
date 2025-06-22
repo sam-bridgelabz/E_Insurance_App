@@ -11,7 +11,8 @@ class Plan(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
 class CreatePlan(Plan):
-    created_by: str
+    # created_by: str
+    pass
     
 class ShowPlan(Plan):
     id: str

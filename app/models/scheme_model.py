@@ -22,7 +22,7 @@ class Scheme(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     created_by: Mapped[str] = mapped_column(
-        ForeignKey("employees.id", ondelete="SET NULL"), nullable=False
+        ForeignKey("employees.id", ondelete="SET NULL"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
     commission_rule: Mapped[dict] = mapped_column(JSON, nullable=False)

@@ -25,6 +25,13 @@ def create_plan(request: plan_schema.CreatePlan, db: Session=Depends(get_db), cu
             )
         
         plan_data = request.model_dump()
+        if current_user["role"] != "admin" and current_user["role"]!="employee":
+            func_logger.error("You dont have the permission to create a plan!")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You dont have the permission to create a plan!"
+            )
+            
         plan_data["created_by"] = current_user["user"].id
         
         new_plan = plan_model.Plan(**plan_data)
@@ -51,7 +58,7 @@ def create_plan(request: plan_schema.CreatePlan, db: Session=Depends(get_db), cu
 def get_all_plans(db:Session=Depends(get_db), current_user_role: dict=Depends(employee_required)):
     func_logger.info("GET /plan/all_plans - Get the list of all plans")
     
-    plans = db.plan(plan_model.Plan).all()
+    plans = db.query(plan_model.Plan).all()
     return plans
 
 
