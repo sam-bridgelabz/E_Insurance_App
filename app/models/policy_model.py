@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.models.agent_model import Agent
+    from app.models.customer_model import Customer
 
 class Policy(Base):
     __tablename__ = "policies"
