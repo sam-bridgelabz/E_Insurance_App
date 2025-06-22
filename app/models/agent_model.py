@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from app.models.employee_model import Employee
+    from app.models.policy_model import Policy
 
 
 class Agent(Base):

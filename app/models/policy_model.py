@@ -2,6 +2,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, text, Date, ForeignKey, event
 from datetime import date
 from app.db.base import Base
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.agent_model import Agent
 
 class Policy(Base):
     __tablename__ = "policies"

@@ -3,6 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from app.models.plan_model import Plan
 from app.models.scheme_model import Scheme
+from app.models.policy_model import Policy
 from app.models.admin_model import Admin
 from app.models.agent_model import Agent
 from app.models.employee_model import Employee
