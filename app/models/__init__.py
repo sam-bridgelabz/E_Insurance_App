@@ -1,4 +1,4 @@
 from .admin_model import Admin
 from .agent_model import Agent
 from .employee_model import Employee
-from .scheme import Scheme
+from .scheme_model import Scheme

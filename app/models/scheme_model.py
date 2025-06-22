@@ -22,4 +22,5 @@ class Scheme(Base):
 
     commission_rule: Mapped[dict] = mapped_column(JSON, nullable=False)
 
-    plan: Mapped["Plan"] = relationship(back_populates="schemes")
+    # plan: Mapped["Plan"] = relationship(back_populates="schemes")
+    plan_id: Mapped[str] = mapped_column(String, nullable=False)

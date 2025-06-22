@@ -17,6 +17,7 @@ def get_current_user(
         token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
     try:
+        print('func')
         token_obj = AccessToken(secret_key=api_settings.SECRET_KEY)
         token_data = token_obj.verify_access_token(token, CredentialsException)
 

@@ -13,6 +13,7 @@ class AccessToken:
 
     def create_access_token(self, data: dict,
                             expires_delta: timedelta | None = None):
+        print('token')
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta

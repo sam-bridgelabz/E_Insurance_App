@@ -33,7 +33,6 @@ def login(
     try:
         email = request.username
         password = request.password
-
         user = (
                 db.query(admin_model.Admin).filter(
                     admin_model.Admin.email == email).first()
@@ -44,7 +43,6 @@ def login(
                 .filter(agent_model.Agent.email == email)
                 .first()
         )
-
         if not user or not Hash.verify_password(password, user.password):
             raise InvalidCredentialsException()
 

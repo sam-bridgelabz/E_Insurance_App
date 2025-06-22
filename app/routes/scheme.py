@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.auth.oauth2 import get_current_user
 from app.db.session import get_db
-from app.models.scheme import Scheme
+from app.models.scheme_model import Scheme
 from app.schemas.scheme_schema import (
     SchemeCreate, SchemeRead, SchemeSuccessResponse, SchemeDeleteResponse
 )
