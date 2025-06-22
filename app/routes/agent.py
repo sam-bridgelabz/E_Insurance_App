@@ -52,7 +52,7 @@ def create_agent(
 
     except SQLAlchemyError as e:
         db.rollback()
-        func_logger.error("❌ Database error during agent creation!")
+        func_logger.error(f"❌ Database error during agent creation!: {e}")
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error during agent creation"

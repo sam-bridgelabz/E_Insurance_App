@@ -19,7 +19,7 @@ class Agent(Base):
     password: Mapped[str] = mapped_column(String(100), nullable=False)
 
     emp: Mapped["Employee"] = relationship("Employee", back_populates="agents")
-
+    
 
 @event.listens_for(Agent, "before_insert")
 def get_agent_id(mapper, connection, target):
