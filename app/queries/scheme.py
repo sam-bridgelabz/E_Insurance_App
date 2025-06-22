@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.scheme import Scheme
+from app.models.scheme_model import Scheme
 
 
 class SchemeQueries:

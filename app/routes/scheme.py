@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.auth.oauth2 import get_current_user
 from app.db.session import get_db
-from app.models.scheme import Scheme
+from app.models.scheme_model import Scheme
 from app.schemas.scheme_schema import (
     SchemeCreate, SchemeRead, SchemeSuccessResponse, SchemeDeleteResponse
 )
@@ -53,7 +53,7 @@ async def create_scheme(scheme_data: SchemeCreate,
 
 
 @scheme_router.get("/{scheme_id}", response_model=SchemeSuccessResponse)
-async def get_scheme(scheme_id: int, db: Session = Depends(get_db),
+async def get_scheme(scheme_id: str, db: Session = Depends(get_db),
                      current_user: dict = Depends(get_current_user)):
     ensure_admin_or_employee(current_user)
 
@@ -69,7 +69,7 @@ async def get_scheme(scheme_id: int, db: Session = Depends(get_db),
 
 
 @scheme_router.delete("/{scheme_id}", response_model=SchemeDeleteResponse)
-async def delete_scheme(scheme_id: int, db: Session = Depends(get_db),
+async def delete_scheme(scheme_id: str, db: Session = Depends(get_db),
                         current_user: dict = Depends(get_current_user)):
     ensure_admin_or_employee(current_user)
 
@@ -87,7 +87,7 @@ async def delete_scheme(scheme_id: int, db: Session = Depends(get_db),
 
 
 @scheme_router.put("/{scheme_id}", response_model=SchemeSuccessResponse)
-async def update_scheme(scheme_id: int, scheme_data: SchemeCreate,
+async def update_scheme(scheme_id: str, scheme_data: SchemeCreate,
                         db: Session = Depends(get_db),
                         current_user: dict = Depends(get_current_user)):
     ensure_admin_or_employee(current_user)

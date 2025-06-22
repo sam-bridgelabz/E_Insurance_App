@@ -20,6 +20,14 @@ class Logger:
             config_log = json.load(f)
 
         for handler in config_log["handler"]:
+            log_file_path = handler["sink"]
+
+            if not os.path.exists(log_file_path):
+                with open(log_file_path, "w") as log_file:
+                    log_file.write(
+                        "LEVEL  | TIME                | MODULE              | LINE | MESSAGE\n"
+                    )
+
             filter_name = handler.pop("filter", None)
             filter_func = {"config": db_filter, "func": func_filter}.get(
                 filter_name)

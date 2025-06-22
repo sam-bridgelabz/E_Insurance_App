@@ -140,7 +140,7 @@ def update_admin(
         db.commit()
         db.refresh(admin)
 
-        func_logger.info(f"✅ Admin updated successfully: {id}")
+        func_logger.info(f"Admin updated successfully: {id}")
         return {
             "message": f"Admin updated successfully: {id}",
             "status": status.HTTP_202_ACCEPTED,

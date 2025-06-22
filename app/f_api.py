@@ -43,7 +43,6 @@ f_api = FastAPI(
     lifespan=lifespan,
 )
 
-f_api.include_router(scheme_router)
 
 
 f_api.include_router(auth.login_router)
@@ -51,6 +50,7 @@ f_api.include_router(auth.user_router)
 f_api.include_router(admin.admin_router)
 f_api.include_router(employee.employee_router)
 f_api.include_router(agent.agent_router)
+f_api.include_router(scheme_router)
 
 f_api.add_exception_handler(SchemeNotFound, scheme_not_found_handler)
 f_api.add_exception_handler(SchemeAlreadyExists, scheme_already_exists_handler)

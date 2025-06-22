@@ -24,7 +24,6 @@ def create_employee(
         current_user: dict = Depends(admin_required),
 ):
     func_logger.info("POST /employee - Create new Employee!")
-
     try:
         existing_email = (
             db.query(employee_model.Employee)
