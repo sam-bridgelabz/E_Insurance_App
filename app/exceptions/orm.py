@@ -78,3 +78,10 @@ class PolicyNotFound(HTTPException):
             detail="Policy Not Found", 
         )
     
+class CustomerNotFound(HTTPException):
+    def __init__(self, status_code, detail = None, headers = None):
+        super().__init__(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Customer Not Found", 
+        )
+    

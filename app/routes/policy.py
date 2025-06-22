@@ -17,10 +17,10 @@ from typing import List
 policy_router = APIRouter(prefix="/policy", tags=["Policy"])
 
 
-def ensure_agent(current_user: dict):
-    if current_user["role"] != "agent":
+def ensure_admin_or_agent(current_user: dict):
+    if current_user["role"] not in ["agent", "admin"]:
         raise UnauthorizedAccess(
-            status_code=403, detail="Access denied: Only agent allowed"
+            status_code=403, detail="Access denied: Only admin or agent allowed"
         )
 
 
@@ -32,7 +32,7 @@ def add_policy(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    ensure_agent(current_user)
+    ensure_admin_or_agent(current_user)
     existing = PolicyQueries.get_by_name(db, policy.name)
     if existing:
         raise PolicyAlreadyExists()
@@ -79,7 +79,7 @@ def update_policy(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    ensure_agent(current_user)
+    ensure_admin_or_agent(current_user)
 
     policy = db.query(Policy).filter(Policy.id == policy_id).first()
     if not policy:
@@ -107,7 +107,7 @@ def delete_policy(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    ensure_agent(current_user)
+    ensure_admin_or_agent(current_user)
 
     policy = db.query(Policy).filter(Policy.id == policy_id).first()
     if not policy:
