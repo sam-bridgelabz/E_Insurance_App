@@ -1,9 +1,10 @@
 from sqlalchemy import String, ForeignKey, Date, Enum, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import event
-from datetime import date
+from datetime import date, datetime
 from app.db.base import Base
 from app.utils.transaction_enum import TransactionType, TransactionStatus
+
 
 class Transaction(Base):
     __tablename__ = "transactions"
@@ -11,10 +12,12 @@ class Transaction(Base):
     transaction_id: Mapped[str] = mapped_column(primary_key=True)
     policy_id: Mapped[str] = mapped_column(ForeignKey("policies.id", ondelete="CASCADE"), nullable=False)
     type: Mapped[TransactionType] = mapped_column(Enum(TransactionType), nullable=False)
-    date: Mapped[date] = mapped_column(Date, default=date.today)
+    date: Mapped[datetime] = mapped_column(Date, default=datetime.now())
     status: Mapped[TransactionStatus] = mapped_column(Enum(TransactionStatus), default=TransactionStatus.pending)
 
     policy = relationship("Policy", back_populates="transactions")
+    commission = relationship("Commission", back_populates="transaction", cascade="all, delete", uselist=False)
+    
 
 
 @event.listens_for(Transaction, "before_insert")

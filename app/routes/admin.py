@@ -9,6 +9,8 @@ from app.utils.hash_password import Hash
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from app.exceptions.orm import UnauthorizedAccess, DatabaseIntegrityError, AdminNotFound, AdminAlreadyExists
+from app.queries.user_queries import AdminQueries
 
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -25,14 +27,11 @@ def create_admin(
     func_logger.info("POST /admin - Create new Admin!")
 
     try:
-        existing_email = (
-            db.query(admin_model.Admin)
-            .filter(request.email == admin_model.Admin.email)
-            .first()
-        )
+        existing_email = AdminQueries.get_by_email(db, request.email).first()
+        
         if existing_email:
             func_logger.error(f"Email already exists: {request.email}")
-            raise HTTPException(
+            raise UnauthorizedAccess(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Email already exists: {request.email}",
             )
@@ -51,7 +50,7 @@ def create_admin(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during adding admin!")
-        raise HTTPException(
+        raise DatabaseIntegrityError(
             status_code=500, detail="Internal Server Error during signup"
         )
 
@@ -76,13 +75,11 @@ def get_admin_by_id(
         current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"GET /admin/{id} - Get Admin Details!")
-    admin = db.query(admin_model.Admin).filter(
-        admin_model.Admin.id == id).first()
+    admin = AdminQueries.get_by_id(db, id).first()
 
     if not admin:
         func_logger.error(f"❌The admin is not present: {id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+        raise AdminNotFound(
             detail=f"The admin is not present: {id}",
         )
 
@@ -98,35 +95,26 @@ def update_admin(
     func_logger.info(f"PUT /admin/- Update Admin Details!")
 
     if current_user["role"] != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+        raise UnauthorizedAccess(
             detail="You aren't allowed to make changes here!"
         )
 
     try:
         id = current_user["user"].id
-        admin = db.query(admin_model.Admin).filter(
-            admin_model.Admin.id == id).first()
+        admin = AdminQueries.get_by_id(db,id).first()
 
         if not admin:
             func_logger.error(f"❌The admin is not present: {id}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+            raise AdminNotFound(
                 detail=f"The admin is not present: {id}",
             )
 
         update_data = request.model_dump(exclude_unset=True)
 
         if "email" in update_data:
-            existing_admin = (
-                db.query(admin_model.Admin)
-                .filter(admin_model.Admin.email == update_data["email"],
-                        admin_model.Admin.id != id)
-                .first()
-            )
+            existing_admin = AdminQueries.check_if_email_is_same(db, update_data["email"], id).first()
             if existing_admin:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
+                raise AdminAlreadyExists(
                     detail="Email is already in use by another admin.",
                 )
 
@@ -149,7 +137,7 @@ def update_admin(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during updation!!")
-        raise HTTPException(
+        raise DatabaseIntegrityError(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error occurred in Database during update.",
         )
@@ -162,16 +150,16 @@ def delete_admin(
 ):
     func_logger.info(f"DELETE /admin/{id} - Delete Admin Details!")
     try:
-        admin = db.query(admin_model.Admin).filter(admin_model.Admin.id == id)
+        admin = AdminQueries.get_by_id(db, id).first()
 
-        if not admin.first():
+        if not admin:
             func_logger.error(f"❌The admin is not present: {id}")
-            raise HTTPException(
+            raise AdminNotFound(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"The admin is not present: {id}",
             )
-
-        admin.delete(synchronize_session=False)
+        
+        db.delete(admin)
         db.commit()
 
         func_logger.info(f"Admin deleted successfully: {id}")
@@ -183,7 +171,7 @@ def delete_admin(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during user deletion.")
-        raise HTTPException(
+        raise DatabaseIntegrityError(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error during user deletion",
         )

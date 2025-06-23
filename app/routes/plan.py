@@ -7,6 +7,7 @@ from app.models import plan_model
 from app.schemas import plan_schema
 from app.auth.role_checker import employee_required, get_current_user
 from app.config.logger_config import func_logger
+from app.exceptions.orm import PlanAlreadyExists,DatabaseIntegrityError, PlanNotFound, UnauthorizedAccess
 
 plan_router = APIRouter(prefix='/plan', tags=["Plans"])
 
@@ -19,18 +20,14 @@ def create_plan(request: plan_schema.CreatePlan, db: Session=Depends(get_db), cu
         existing_plan = db.query(plan_model.Plan).filter(request.name == plan_model.Plan.name).first()
         if existing_plan:
             func_logger.error(f"Plan already exists: {request.name}")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Plane already exists: {request.name}",
+            raise PlanAlreadyExists(
+                detail=f"Plan already exists: {request.name}",
             )
         
         plan_data = request.model_dump()
         if current_user["role"] != "admin" and current_user["role"]!="employee":
             func_logger.error("You dont have the permission to create a plan!")
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You dont have the permission to create a plan!"
-            )
+            raise UnauthorizedAccess()
             
         plan_data["created_by"] = current_user["user"].id
         
@@ -48,8 +45,7 @@ def create_plan(request: plan_schema.CreatePlan, db: Session=Depends(get_db), cu
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during employee creation!")
-        raise HTTPException(
-            status_code=500,
+        raise DatabaseIntegrityError(
             detail="Internal Server Error during employee creation"
         )
         
@@ -73,10 +69,7 @@ def get_plan_by_id(
     plan = db.query(plan_model.Plan).filter(plan_model.Plan.id == plan_id).first()
     if not plan:
         func_logger.warning(f"Plan not found: {plan_id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Plan not found"
-        )
+        raise PlanNotFound()
     return plan
 
 
@@ -92,10 +85,7 @@ def update_plan(
     plan = db.query(plan_model.Plan).filter(plan_model.Plan.id == plan_id).first()
     if not plan:
         func_logger.warning(f"Plan not found: {plan_id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Plan not found"
-        )
+        raise PlanNotFound()
     
     update_data = request.model_dump()
     for key, value in update_data.items():
@@ -108,8 +98,7 @@ def update_plan(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error(f"❌ Database error during plan update for ID: {plan_id}")
-        raise HTTPException(
-            status_code=500,
+        raise DatabaseIntegrityError(
             detail="Internal Server Error during plan update"
         )
 
@@ -125,10 +114,7 @@ def delete_plan(
     plan = db.query(plan_model.Plan).filter(plan_model.Plan.id == plan_id).first()
     if not plan:
         func_logger.warning(f"Plan not found: {plan_id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Plan not found"
-        )
+        raise PlanNotFound()
 
     try:
         db.delete(plan)
@@ -137,7 +123,6 @@ def delete_plan(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error(f"❌ Database error during plan deletion for ID: {plan_id}")
-        raise HTTPException(
-            status_code=500,
+        raise DatabaseIntegrityError(
             detail="Internal Server Error during plan deletion"
         )
