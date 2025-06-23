@@ -8,3 +8,4 @@ smtp_settings = SMTPSettings()
 if __name__ == "__main__":
     print(db_settings)
     print(api_settings)
+    print(smtp_settings)

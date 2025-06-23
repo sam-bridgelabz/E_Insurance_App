@@ -25,7 +25,6 @@ class Scheme(Base):
         ForeignKey("employees.id", ondelete="SET NULL"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
-    commission_rule: Mapped[dict] = mapped_column(JSON, nullable=False)
 
     plan = relationship("Plan", back_populates="schemes")
 
