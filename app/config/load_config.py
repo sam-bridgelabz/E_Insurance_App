@@ -1,9 +1,9 @@
-from app.config.config import APISettings, DBSettings, SMTPSettings
+from app.config.config import APISettings, DBSettings, SMTPSettings, RedisSettings
 
 db_settings = DBSettings()
 api_settings = APISettings()
 smtp_settings = SMTPSettings()
-
+redis_settings = RedisSettings()
 
 if __name__ == "__main__":
     print(db_settings)
