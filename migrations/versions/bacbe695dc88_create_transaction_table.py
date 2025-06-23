@@ -15,7 +15,7 @@ from app.utils.transaction_enum import TransactionStatus, TransactionType
 
 # revision identifiers, used by Alembic.
 revision: str = 'bacbe695dc88'
-down_revision: Union[str, None] = '5ceb0f6009bb'
+down_revision: Union[str, None] = 'ee998e10adbf'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
