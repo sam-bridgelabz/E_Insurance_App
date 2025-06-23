@@ -56,3 +56,19 @@ class SMTPSettings(BaseSettings):
     SMTP_PASSWORD : str
     BACKEND_URL : str
     EMAIL_FROM : str
+
+class RedisSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_ignore_empty=True,
+    )
+
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_DB: int = 0
+
+    @property
+    def REDIS_URL(self) -> str:
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
