@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 from app.auth.oauth2 import get_current_user
 from app.db.session import get_db
@@ -12,7 +12,7 @@ from app.exceptions.orm import SchemeNotFound, SchemeAlreadyExists, \
 
 scheme_router = APIRouter(
     prefix="/api/schemes",
-    tags=["schemes"]
+    tags=["Scheme"]
 )
 
 
@@ -38,8 +38,7 @@ async def create_scheme(scheme_data: SchemeCreate,
         plan_id=scheme_data.plan_id,
         name=scheme_data.name,
         description=scheme_data.description,
-        created_by=current_user["user"].id,
-        commission_rule=scheme_data.commission_rule
+        created_by=current_user["user"].id
     )
     db.add(scheme)
     db.commit()
@@ -99,7 +98,6 @@ async def update_scheme(scheme_id: str, scheme_data: SchemeCreate,
     scheme.name = scheme_data.name
     scheme.description = scheme_data.description
     scheme.plan_id = scheme_data.plan_id
-    scheme.commission_rule = scheme_data.commission_rule
     db.commit()
     db.refresh(scheme)
 

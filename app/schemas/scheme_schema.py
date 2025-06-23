@@ -9,7 +9,6 @@ class SchemeCreate(BaseModel):
     plan_id: str
     name: str = Field(..., max_length=100)
     description: Optional[str] = Field(None, max_length=500)
-    commission_rule: Dict[str, int]
 
 
 class SchemeRead(SchemeCreate):

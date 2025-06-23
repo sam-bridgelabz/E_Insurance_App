@@ -22,6 +22,9 @@ class Logger:
         for handler in config_log["handler"]:
             log_file_path = handler["sink"]
 
+            log_dir = os.path.dirname(log_file_path)
+            os.makedirs(log_dir, exist_ok=True)
+
             if not os.path.exists(log_file_path):
                 with open(log_file_path, "w") as log_file:
                     log_file.write(

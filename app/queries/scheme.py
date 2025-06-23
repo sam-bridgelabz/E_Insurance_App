@@ -5,7 +5,7 @@ from app.models.policy_model import Policy
 class SchemeQueries:
 
     @staticmethod
-    def get_by_id(db: Session, scheme_id: int) -> Scheme | None:
+    def get_by_id(db: Session, scheme_id: str) -> Scheme | None:
         return db.query(Scheme).filter(Scheme.id == scheme_id).first()
 
     @staticmethod
@@ -15,7 +15,7 @@ class SchemeQueries:
 class PolicyQueries:
 
     @staticmethod
-    def get_by_id(db: Session, scheme_id: int) -> Policy | None:
+    def get_by_id(db: Session, scheme_id: str) -> Policy | None:
         return db.query(Policy).filter(Policy.id == scheme_id).first()
 
     @staticmethod
