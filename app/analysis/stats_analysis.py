@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -8,6 +9,9 @@ from app.models.policy_model import Policy
 
 sns.set_theme(style="whitegrid")
 
+# Ensure the plots directory exists
+PLOT_DIR = "plots"
+os.makedirs(PLOT_DIR, exist_ok=True)
 
 def load_policy_data(db: Session):
     result = (
@@ -76,25 +80,27 @@ def monthly_sales_summary(df):
     return grouped
 
 
-def plot_top_5_agents_by_amount(data):
+def plot_top_5_agents_by_amount(data, filename):
     plt.figure(figsize=(10, 6))
     sns.barplot(x="month", y="premium_amount", hue="agent_id", data=data)
     plt.title("Top 5 Agents by Premium Amount Sold (Monthly)")
     plt.ylabel("Total Premium Amount")
     plt.tight_layout()
-    plt.show()
+    plt.savefig(filename)
+    plt.close()
 
 
-def plot_top_5_agents_by_count(data):
+def plot_top_5_agents_by_count(data, filename):
     plt.figure(figsize=(10, 6))
     sns.barplot(x="month", y="policy_count", hue="agent_id", data=data)
     plt.title("Top 5 Agents by Number of Policies Sold (Monthly)")
     plt.ylabel("Number of Policies")
     plt.tight_layout()
-    plt.show()
+    plt.savefig(filename)
+    plt.close()
 
 
-def plot_monthly_sales_summary(data):
+def plot_monthly_sales_summary(data, filename):
     fig, ax1 = plt.subplots(figsize=(10, 6))
     ax2 = ax1.twinx()
     sns.barplot(x="month", y="total_sales", data=data, ax=ax1, color="skyblue", label="Total Sales")
@@ -103,7 +109,8 @@ def plot_monthly_sales_summary(data):
     ax1.set_ylabel("Total Premium Amount")
     ax2.set_ylabel("Number of Policies")
     fig.tight_layout()
-    plt.show()
+    plt.savefig(filename)
+    plt.close()
 
 
 def main():
@@ -125,10 +132,12 @@ def main():
 
         summary = monthly_sales_summary(df)
 
-        # Plotting
-        plot_top_5_agents_by_amount(top_5_agents_by_amount(df))
-        plot_top_5_agents_by_count(top_5_agents_by_count(df))
-        plot_monthly_sales_summary(summary)
+        # Save Plots to Files
+        plot_top_5_agents_by_amount(top_5_agents_by_amount(df), f"{PLOT_DIR}/top_agents_by_amount.png")
+        plot_top_5_agents_by_count(top_5_agents_by_count(df), f"{PLOT_DIR}/top_agents_by_count.png")
+        plot_monthly_sales_summary(summary, f"{PLOT_DIR}/monthly_summary.png")
+
+        print(f"\n✅ Plots saved in '{PLOT_DIR}/'")
 
     finally:
         db.close()
