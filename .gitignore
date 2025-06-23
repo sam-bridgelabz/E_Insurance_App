@@ -54,3 +54,8 @@ test-results/
 build/
 dist/
 *.egg-info/
+
+# celery-schedule files
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir

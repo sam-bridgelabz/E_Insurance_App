@@ -1,5 +1,4 @@
-from app.config.config import APISettings, DBSettings, SMTPSettings, \
-    RedisSettings
+from app.config.config import APISettings, DBSettings, SMTPSettings, RedisSettings
 
 db_settings = DBSettings()
 api_settings = APISettings()
