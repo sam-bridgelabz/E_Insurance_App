@@ -44,7 +44,7 @@ def add_policy(
         raise ZeroAmountError()
 
     policy_data = policy.model_dump()
-    policy_data["agent_id"] = current_user["id"]
+    policy_data["agent_id"] = current_user["user"].id  
     new_policy = Policy(**policy_data)
 
     db.add(new_policy)

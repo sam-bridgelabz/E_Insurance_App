@@ -13,7 +13,7 @@ from app.exceptions.orm import (
 )
 
 from app.routes.scheme import scheme_router
-from app.routes import admin, agent, employee, auth, plan, policy, customer
+from app.routes import admin, agent, employee, auth, plan, policy, customer, transaction
 from fastapi import FastAPI
 
 
@@ -54,6 +54,7 @@ f_api.include_router(plan.plan_router)
 f_api.include_router(scheme_router)
 f_api.include_router(policy.policy_router)
 f_api.include_router(customer.customer_router)
+f_api.include_router(transaction.transaction_router)
 
 f_api.add_exception_handler(SchemeNotFound, scheme_not_found_handler)
 f_api.add_exception_handler(SchemeAlreadyExists, scheme_already_exists_handler)
