@@ -9,6 +9,8 @@ from app.utils.hash_password import Hash
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from app.exceptions.orm import DatabaseIntegrityError, EmailAlreadyExists, EmployeeNotFound
+from app.queries.user_queries import EmployeeQueries
 
 employee_router = APIRouter(prefix="/employee", tags=["Employee"])
 
@@ -25,15 +27,11 @@ def create_employee(
 ):
     func_logger.info("POST /employee - Create new Employee!")
     try:
-        existing_email = (
-            db.query(employee_model.Employee)
-            .filter(employee_model.Employee.email == request.email)
-            .first()
-        )
+        existing_email = EmployeeQueries.get_by_email(db, request.email).first()
+        
         if existing_email:
             func_logger.error(f"Email already exists: {request.email}")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+            raise EmailAlreadyExists(
                 detail=f"Email already exists: {request.email}",
             )
 
@@ -53,8 +51,7 @@ def create_employee(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during employee creation!")
-        raise HTTPException(
-            status_code=500,
+        raise DatabaseIntegrityError(
             detail="Internal Server Error during employee creation"
         )
 
@@ -79,17 +76,13 @@ def get_employee_by_id(
         current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"GET /employee/{id} - Get Employee Details!")
-    emp = (
-        db.query(employee_model.Employee)
-        .filter(employee_model.Employee.id == id)
-        .first()
-    )
+    emp = EmployeeQueries.get_by_id(db, id).first()
+
 
     if not emp:
         func_logger.error(f"❌The employee is not present: {id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"The employee is not present: {id}",
+        raise EmployeeNotFound(
+            detail=f"The employee is not present: {id}"
         )
 
     return emp
@@ -105,13 +98,11 @@ def update_employee(
     func_logger.info(f"PUT /employee/{id} - Update Employee Details!")
 
     try:
-        emp = db.query(employee_model.Employee).filter(
-            employee_model.Employee.id == id)
+        emp = EmployeeQueries.get_by_id(db, id)
         if not emp.first():
             func_logger.error(f"❌The employee is not present: {id}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"The employee is not present: {id}",
+            raise EmployeeNotFound(
+                detail=f"The employee is not present: {id}"
             )
 
         update_data = request.model_dump(exclude_unset=True)
@@ -132,9 +123,8 @@ def update_employee(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during employee update!")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error occurred in Database during update.",
+        raise DatabaseIntegrityError(
+            detail="Error occurred in Database during update."
         )
 
 
@@ -145,14 +135,12 @@ def delete_employee(
 ):
     func_logger.info(f"DELETE /employee/{id} - Delete Employee!")
     try:
-        emp = db.query(employee_model.Employee).filter(
-            employee_model.Employee.id == id)
+        emp = EmployeeQueries.get_by_id(db, id)
 
         if not emp.first():
             func_logger.error(f"❌The employee is not present: {id}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"The employee is not present: {id}",
+            raise EmployeeNotFound(
+                detail=f"The employee is not present: {id}"
             )
 
         emp.delete(synchronize_session=False)
@@ -167,7 +155,6 @@ def delete_employee(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during employee deletion.")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error during employee deletion",
+        raise DatabaseIntegrityError(
+            detail="Internal Server Error during employee deletion"
         )

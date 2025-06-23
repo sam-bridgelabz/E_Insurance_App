@@ -9,6 +9,7 @@ from app.utils.hash_password import Hash
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from app.exceptions.orm import EmailAlreadyExists, DatabaseIntegrityError,AgentNotFound
 
 agent_router = APIRouter(prefix="/agent", tags=["Agent"])
 
@@ -32,9 +33,8 @@ def create_agent(
         )
         if existing_email:
             func_logger.error(f"Email already exists: {request.email}")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Email already exists: {request.email}",
+            raise EmailAlreadyExists(
+                detail=f"Email already exists: {request.email}"
             )
 
         agent_data = request.model_dump()
@@ -53,10 +53,7 @@ def create_agent(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error(f"❌ Database error during agent creation!: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Internal Server Error during agent creation"
-        )
+        raise DatabaseIntegrityError()
 
 
 @agent_router.get(
@@ -84,9 +81,8 @@ def get_agent_by_id(
 
     if not agent:
         func_logger.error(f"❌The agent is not present: {id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"The agent is not present: {id}",
+        raise AgentNotFound(
+            detail=f"The agent is not present: {id}"
         )
 
     return agent
@@ -105,9 +101,8 @@ def update_agent(
         agent = db.query(agent_model.Agent).filter(agent_model.Agent.id == id)
         if not agent.first():
             func_logger.error(f"❌The agent is not present: {id}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"The agent is not present: {id}",
+            raise AgentNotFound(
+                detail=f"The agent is not present: {id}"
             )
 
         update_data = request.model_dump(exclude_unset=True)
@@ -128,10 +123,7 @@ def update_agent(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during agent update!")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error occurred in Database during update.",
-        )
+        raise DatabaseIntegrityError()
 
 
 @agent_router.delete("/{id}", status_code=status.HTTP_200_OK)
@@ -146,9 +138,8 @@ def delete_agent(
 
         if not agent.first():
             func_logger.error(f"❌The agent is not present: {id}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"The agent is not present: {id}",
+            raise AgentNotFound(
+                detail=f"The agent is not present: {id}"
             )
 
         agent.delete(synchronize_session=False)
@@ -163,7 +154,4 @@ def delete_agent(
     except SQLAlchemyError as e:
         db.rollback()
         func_logger.error("❌ Database error during agent deletion.")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error during agent deletion",
-        )
+        raise DatabaseIntegrityError()

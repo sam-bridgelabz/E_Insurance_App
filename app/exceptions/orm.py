@@ -1,6 +1,44 @@
 from fastapi import HTTPException, status
 
-
+class AdminNotFound(HTTPException):
+    def __init__(self,
+                 status_code: int = status.HTTP_404_NOT_FOUND,
+                 detail: str="Admin not found"):
+        super().__init__(status_code=status_code, detail=detail)
+        
+class AdminAlreadyExists(HTTPException):
+    def __init__(self, status_code: int = status.HTTP_409_CONFLICT,
+                 detail: str = "Admin Already Exists"):
+        super().__init__(status_code=status_code, detail=detail)
+        
+class EmailAlreadyExists(HTTPException):
+    def __init__(self, status_code: int = status.HTTP_409_CONFLICT,
+                 detail: str = "Email Already Exists"):
+        super().__init__(status_code=status_code, detail=detail)
+        
+class AgentNotFound(HTTPException):
+    def __init__(self,
+                 status_code: int = status.HTTP_404_NOT_FOUND,
+                 detail: str="Agent not found"):
+        super().__init__(status_code=status_code, detail=detail)
+        
+class EmployeeNotFound(HTTPException):
+    def __init__(self,
+                 status_code: int = status.HTTP_404_NOT_FOUND,
+                 detail: str="Employee not found"):
+        super().__init__(status_code=status_code, detail=detail)
+        
+class PlanAlreadyExists(HTTPException):
+    def __init__(self, status_code: int = status.HTTP_409_CONFLICT,
+                 detail: str = "Plan Already Exists"):
+        super().__init__(status_code=status_code, detail=detail)
+        
+class PlanNotFound(HTTPException):
+    def __init__(self,
+                 status_code: int = status.HTTP_404_NOT_FOUND,
+                 detail: str="Plan not found"):
+        super().__init__(status_code=status_code, detail=detail)
+        
 class SchemeNotFound(HTTPException):
     def __init__(self, status_code: int = status.HTTP_404_NOT_FOUND,
                  detail: str = "Scheme not found"):

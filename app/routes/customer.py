@@ -6,7 +6,7 @@ from app.schemas.customer_schema import CustomerCreate, CustomerResponse, Custom
 from app.db.session import get_db
 from typing import List
 from app.utils.hash_password import Hash
-from app.exceptions.orm import CustomerNotFound, UnauthorizedAccess
+from app.exceptions.orm import CustomerNotFound, UnauthorizedAccess, EmailAlreadyExists
 
 customer_router = APIRouter(prefix="/customers", tags=["Customer"])
 
@@ -20,7 +20,7 @@ def ensure_admin_or_agent(current_user: dict):
 def create_customer(customer: CustomerCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     ensure_admin_or_agent(current_user)
     if db.query(Customer).filter(Customer.email == customer.email).first():
-        raise HTTPException(status_code=400, detail="Customer with this email already exists")
+        raise EmailAlreadyExists(detail="Customer with this email already exists")
 
     customer_data = customer.model_dump()
     customer_data["password"] = Hash.get_hash_password(customer.password)
