@@ -22,6 +22,7 @@ class Policy(Base):
 
     customer: Mapped["Customer"] = relationship("Customer", back_populates="policies")
     agent: Mapped["Agent"] = relationship("Agent", back_populates="policies")
+    transactions = relationship("Transaction", back_populates="policy", cascade="all, delete")
 
 @event.listens_for(Policy, "before_insert")
 def set_policy_id(mapper, connection, target):

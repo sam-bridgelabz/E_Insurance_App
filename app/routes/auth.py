@@ -26,6 +26,8 @@ def get_user(
         current_user=Depends(get_current_user)
 ):
     func_logger.info(f"User data fetched for ID: {current_user['user'].id}")
+    if not current_user["user"].created_at: # temporary fix
+        current_user["user"].created_at = None
     return current_user["user"]
 
 

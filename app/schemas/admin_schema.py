@@ -18,7 +18,7 @@ class CreateAdmin(AdminSchema):
 
 class ShowAdmin(AdminSchema):
     id: str
-    created_at: datetime
+    created_at: Optional[datetime]
     model_config = ConfigDict(from_attributes=True)
 
 
