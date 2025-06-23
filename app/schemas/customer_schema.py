@@ -10,7 +10,6 @@ class CustomerBase(BaseModel):
 
 class CustomerCreate(CustomerBase):
     password: str = Field(exclude=True)
-    agent_id: str
     pass
 
 class CustomerResponse(CustomerBase):

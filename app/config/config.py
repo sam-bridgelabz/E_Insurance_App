@@ -41,3 +41,18 @@ class APISettings(BaseSettings):
     HOST_IP_ADDRESS: str
     HOST_PORT_NUMBER: int
     SECRET_KEY: str
+
+class SMTPSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_ignore_empty=True,
+    )
+
+    SMTP_SERVER : str
+    SMTP_PORT : int
+    SMTP_USERNAME : str
+    SMTP_PASSWORD : str
+    BACKEND_URL : str
+    EMAIL_FROM : str
