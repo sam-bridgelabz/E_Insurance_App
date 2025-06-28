@@ -32,8 +32,7 @@ class Logger:
                     )
 
             filter_name = handler.pop("filter", None)
-            filter_func = {"config": db_filter, "func": func_filter}.get(
-                filter_name)
+            filter_func = {"config": db_filter, "func": func_filter}.get(filter_name)
 
             logger.add(**handler, filter=filter_func)
 

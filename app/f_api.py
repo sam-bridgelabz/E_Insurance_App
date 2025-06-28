@@ -1,21 +1,26 @@
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI
+
 from app.config.logger_config import config_logger
 from app.exceptions.handlers import (
-    scheme_not_found_handler,
     scheme_already_exists_handler,
+    scheme_not_found_handler,
     unauthorized_access_handler,
 )
-from app.exceptions.orm import (
-    SchemeNotFound,
-    SchemeAlreadyExists,
-    UnauthorizedAccess,
+from app.exceptions.orm import SchemeAlreadyExists, SchemeNotFound, UnauthorizedAccess
+from app.routes import (
+    admin,
+    agent,
+    auth,
+    customer,
+    employee,
+    payment,
+    plan,
+    policy,
+    transaction,
 )
-
 from app.routes.scheme import scheme_router
-from app.routes import admin, agent, employee, auth, plan, policy, customer, \
-    transaction, payment
-from fastapi import FastAPI
 
 
 @asynccontextmanager
@@ -43,7 +48,6 @@ f_api = FastAPI(
     },
     lifespan=lifespan,
 )
-
 
 
 f_api.include_router(auth.login_router)

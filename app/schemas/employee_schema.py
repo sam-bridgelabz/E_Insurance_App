@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Optional
 
-from app.utils.department_enum import DepartmentEnum
 from pydantic import BaseModel, ConfigDict
+
+from app.utils.department_enum import DepartmentEnum
 
 
 class EmpSchema(BaseModel):

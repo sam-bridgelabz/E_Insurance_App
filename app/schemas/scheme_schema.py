@@ -1,8 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional, Dict
 from datetime import datetime
+from typing import Dict, Optional
 
-from pydantic import ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SchemeCreate(BaseModel):

@@ -1,34 +1,39 @@
 from typing import List
 
-from app.auth.role_checker import admin_required, get_current_user
-from app.config.logger_config import func_logger
-from app.db.session import get_db
-from app.models import admin_model
-from app.schemas import admin_schema
-from app.utils.hash_password import Hash
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-from app.exceptions.orm import UnauthorizedAccess, DatabaseIntegrityError, AdminNotFound, AdminAlreadyExists
+
+from app.auth.role_checker import admin_required, get_current_user
+from app.config.logger_config import func_logger
+from app.db.session import get_db
+from app.exceptions.orm import (
+    AdminAlreadyExists,
+    AdminNotFound,
+    DatabaseIntegrityError,
+    UnauthorizedAccess,
+)
+from app.models import admin_model
 from app.queries.user_queries import AdminQueries
+from app.schemas import admin_schema
+from app.utils.hash_password import Hash
 
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
 
 
 @admin_router.post(
-    "/", status_code=status.HTTP_201_CREATED,
-    response_model=admin_schema.ShowAdmin
+    "/", status_code=status.HTTP_201_CREATED, response_model=admin_schema.ShowAdmin
 )
 def create_admin(
-        request: admin_schema.CreateAdmin,
-        db: Session = Depends(get_db),
-        current_user: dict = Depends(admin_required)
+    request: admin_schema.CreateAdmin,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(admin_required),
 ):
     func_logger.info("POST /admin - Create new Admin!")
 
     try:
         existing_email = AdminQueries.get_by_email(db, request.email).first()
-        
+
         if existing_email:
             func_logger.error(f"Email already exists: {request.email}")
             raise UnauthorizedAccess(
@@ -49,30 +54,28 @@ def create_admin(
 
     except SQLAlchemyError as e:
         db.rollback()
-        func_logger.error("❌ Database error during adding admin!")
+        func_logger.error(f"❌ Database error during adding admin: {e}")
         raise DatabaseIntegrityError(
             status_code=500, detail="Internal Server Error during signup"
         )
 
 
 @admin_router.get(
-    "/", status_code=status.HTTP_200_OK,
-    response_model=List[admin_schema.ShowAdmin]
+    "/", status_code=status.HTTP_200_OK, response_model=List[admin_schema.ShowAdmin]
 )
 def get_all_admins(
-        db: Session = Depends(get_db),
-        current_user: dict = Depends(admin_required)
+    db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
 ):
     func_logger.info("GET /admin - Get list of Admins!")
     admins = db.query(admin_model.Admin).all()
     return admins
 
 
-@admin_router.get("/{id}", status_code=status.HTTP_200_OK,
-                  response_model=admin_schema.ShowAdmin)
+@admin_router.get(
+    "/{id}", status_code=status.HTTP_200_OK, response_model=admin_schema.ShowAdmin
+)
 def get_admin_by_id(
-        id: str, db: Session = Depends(get_db),
-        current_user: dict = Depends(admin_required)
+    id: str, db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"GET /admin/{id} - Get Admin Details!")
     admin = AdminQueries.get_by_id(db, id).first()
@@ -88,39 +91,38 @@ def get_admin_by_id(
 
 @admin_router.put("/", status_code=status.HTTP_202_ACCEPTED)
 def update_admin(
-        request: admin_schema.UpdateAdmin,
-        db: Session = Depends(get_db),
-        current_user: dict = Depends(get_current_user),
+    request: admin_schema.UpdateAdmin,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    func_logger.info(f"PUT /admin/- Update Admin Details!")
+    func_logger.info("PUT /admin/- Update Admin Details!")
 
     if current_user["role"] != "admin":
-        raise UnauthorizedAccess(
-            detail="You aren't allowed to make changes here!"
-        )
+        raise UnauthorizedAccess(detail="You aren't allowed to make changes here!")
 
     try:
-        id = current_user["user"].id
-        admin = AdminQueries.get_by_id(db,id).first()
+        user_id = current_user["user"].id
+        admin = AdminQueries.get_by_id(db, user_id).first()
 
         if not admin:
-            func_logger.error(f"❌The admin is not present: {id}")
+            func_logger.error(f"❌The admin is not present: {user_id}")
             raise AdminNotFound(
-                detail=f"The admin is not present: {id}",
+                detail=f"The admin is not present: {user_id}",
             )
 
         update_data = request.model_dump(exclude_unset=True)
 
         if "email" in update_data:
-            existing_admin = AdminQueries.check_if_email_is_same(db, update_data["email"], id).first()
+            existing_admin = AdminQueries.check_if_email_is_same(
+                db, update_data["email"], user_id
+            ).first()
             if existing_admin:
                 raise AdminAlreadyExists(
                     detail="Email is already in use by another admin.",
                 )
 
         if "password" in update_data:
-            update_data["password"] = Hash.get_hash_password(
-                update_data["password"])
+            update_data["password"] = Hash.get_hash_password(update_data["password"])
 
         for key, value in update_data.items():
             setattr(admin, key, value)
@@ -128,15 +130,15 @@ def update_admin(
         db.commit()
         db.refresh(admin)
 
-        func_logger.info(f"Admin updated successfully: {id}")
+        func_logger.info(f"Admin updated successfully: {user_id}")
         return {
-            "message": f"Admin updated successfully: {id}",
+            "message": f"Admin updated successfully: {user_id}",
             "status": status.HTTP_202_ACCEPTED,
         }
 
     except SQLAlchemyError as e:
         db.rollback()
-        func_logger.error("❌ Database error during updation!!")
+        func_logger.error(f"❌ Database error during updation: {e}")
         raise DatabaseIntegrityError(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error occurred in Database during update.",
@@ -145,8 +147,7 @@ def update_admin(
 
 @admin_router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_admin(
-        id: str, db: Session = Depends(get_db),
-        current_user: dict = Depends(admin_required)
+    id: str, db: Session = Depends(get_db), current_user: dict = Depends(admin_required)
 ):
     func_logger.info(f"DELETE /admin/{id} - Delete Admin Details!")
     try:
@@ -158,7 +159,7 @@ def delete_admin(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"The admin is not present: {id}",
             )
-        
+
         db.delete(admin)
         db.commit()
 
@@ -170,7 +171,7 @@ def delete_admin(
 
     except SQLAlchemyError as e:
         db.rollback()
-        func_logger.error("❌ Database error during user deletion.")
+        func_logger.error(f"❌ Database error during user deletion: {e}")
         raise DatabaseIntegrityError(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error during user deletion",

@@ -1,23 +1,23 @@
-from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.orm import Session
-from app.exceptions.orm import CredentialsException
-from app.config.logger_config import func_logger
-from app.models import admin_model, employee_model, agent_model
+
 from app.auth.token import AccessToken
 from app.config.load_config import api_settings
-
+from app.config.logger_config import func_logger
 from app.db.session import get_db
+from app.exceptions.orm import CredentialsException
+from app.models import admin_model, agent_model, employee_model
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def get_current_user(
-        token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
     try:
-        print('func')
+        print("func")
         token_obj = AccessToken(secret_key=api_settings.SECRET_KEY)
         token_data = token_obj.verify_access_token(token, CredentialsException)
 

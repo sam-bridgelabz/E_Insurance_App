@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, List
 
-from app.db.base import Base
 from sqlalchemy import Integer, String, cast, event, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import text
+
+from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.models.employee_model import Employee
@@ -14,11 +15,10 @@ class Admin(Base):
     __tablename__ = "admins"
 
     id: Mapped[str] = mapped_column(
-        String(20), primary_key=True, nullable=False, unique=True
+        String(20), primary_key=True, nullable=False, unique=True, index=True
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), nullable=False,
-                                       unique=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 

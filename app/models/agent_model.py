@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING, List
 
-from app.db.base import Base
 from sqlalchemy import ForeignKey, String, event, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.models.employee_model import Employee
@@ -15,13 +16,14 @@ class Agent(Base):
     id: Mapped[str] = mapped_column(String(20), primary_key=True)
     emp_id: Mapped[str] = mapped_column(String(20), ForeignKey("employees.id"))
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), nullable=False,
-                                       unique=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
 
     emp: Mapped["Employee"] = relationship("Employee", back_populates="agents")
-    policies: Mapped[List["Policy"]] = relationship("Policy", back_populates="agent", cascade="all, delete-orphan")
-    
+    policies: Mapped[List["Policy"]] = relationship(
+        "Policy", back_populates="agent", cascade="all, delete-orphan"
+    )
+
 
 @event.listens_for(Agent, "before_insert")
 def get_agent_id(mapper, connection, target):

@@ -27,4 +27,3 @@ class UpdateAdmin(BaseModel):
     email: Optional[str] = None
     password: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
-

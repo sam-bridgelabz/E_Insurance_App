@@ -1,9 +1,11 @@
 import os
-import pandas as pd
+
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
+
 from app.db.session import SessionLocal
 from app.models.policy_model import Policy
 
@@ -13,38 +15,44 @@ sns.set_theme(style="whitegrid")
 PLOT_DIR = "plots"
 os.makedirs(PLOT_DIR, exist_ok=True)
 
+
 def load_policy_data(db: Session):
-    result = (
-        db.query(
-            Policy.id.label("policy_id"),
-            Policy.agent_id,
-            Policy.scheme_id,
-            Policy.premium_amount,
-            Policy.start_date
-        ).all()
+    result = db.query(
+        Policy.id.label("policy_id"),
+        Policy.agent_id,
+        Policy.scheme_id,
+        Policy.premium_amount,
+        Policy.start_date,
+    ).all()
+    df = pd.DataFrame(
+        result,
+        columns=["policy_id", "agent_id", "scheme_id", "premium_amount", "start_date"],
     )
-    df = pd.DataFrame(result, columns=["policy_id", "agent_id", "scheme_id", "premium_amount", "start_date"])
-    df['start_date'] = pd.to_datetime(df['start_date'])
-    df['month'] = df['start_date'].dt.to_period('M').astype(str)
+    df["start_date"] = pd.to_datetime(df["start_date"])
+    df["month"] = df["start_date"].dt.to_period("M").astype(str)
     return df
 
 
 def top_5_agents_by_amount(df):
     grouped = (
-        df.groupby(["month", "agent_id"])["premium_amount"].sum()
+        df.groupby(["month", "agent_id"])["premium_amount"]
+        .sum()
         .reset_index()
         .sort_values(["month", "premium_amount"], ascending=[True, False])
-        .groupby("month").head(5)
+        .groupby("month")
+        .head(5)
     )
     return grouped
 
 
 def top_5_agents_by_count(df):
     grouped = (
-        df.groupby(["month", "agent_id"])["policy_id"].count()
+        df.groupby(["month", "agent_id"])["policy_id"]
+        .count()
         .reset_index(name="policy_count")
         .sort_values(["month", "policy_count"], ascending=[True, False])
-        .groupby("month").head(5)
+        .groupby("month")
+        .head(5)
     )
     return grouped
 
@@ -74,7 +82,9 @@ def top_5_schemes(df):
 def monthly_sales_summary(df):
     grouped = (
         df.groupby("month")
-        .agg(total_sales=("premium_amount", "sum"), policies_sold=("policy_id", "count"))
+        .agg(
+            total_sales=("premium_amount", "sum"), policies_sold=("policy_id", "count")
+        )
         .reset_index()
     )
     return grouped
@@ -103,8 +113,23 @@ def plot_top_5_agents_by_count(data, filename):
 def plot_monthly_sales_summary(data, filename):
     fig, ax1 = plt.subplots(figsize=(10, 6))
     ax2 = ax1.twinx()
-    sns.barplot(x="month", y="total_sales", data=data, ax=ax1, color="skyblue", label="Total Sales")
-    sns.lineplot(x="month", y="policies_sold", data=data, ax=ax2, marker="o", color="orange", label="Policies Sold")
+    sns.barplot(
+        x="month",
+        y="total_sales",
+        data=data,
+        ax=ax1,
+        color="skyblue",
+        label="Total Sales",
+    )
+    sns.lineplot(
+        x="month",
+        y="policies_sold",
+        data=data,
+        ax=ax2,
+        marker="o",
+        color="orange",
+        label="Policies Sold",
+    )
     ax1.set_title("Monthly Sales Summary")
     ax1.set_ylabel("Total Premium Amount")
     ax2.set_ylabel("Number of Policies")
@@ -133,8 +158,12 @@ def main():
         summary = monthly_sales_summary(df)
 
         # Save Plots to Files
-        plot_top_5_agents_by_amount(top_5_agents_by_amount(df), f"{PLOT_DIR}/top_agents_by_amount.png")
-        plot_top_5_agents_by_count(top_5_agents_by_count(df), f"{PLOT_DIR}/top_agents_by_count.png")
+        plot_top_5_agents_by_amount(
+            top_5_agents_by_amount(df), f"{PLOT_DIR}/top_agents_by_amount.png"
+        )
+        plot_top_5_agents_by_count(
+            top_5_agents_by_count(df), f"{PLOT_DIR}/top_agents_by_count.png"
+        )
         plot_monthly_sales_summary(summary, f"{PLOT_DIR}/monthly_summary.png")
 
         print(f"\n✅ Plots saved in '{PLOT_DIR}/'")

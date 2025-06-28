@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, JSON, event, text
+from sqlalchemy import JSON, DateTime, ForeignKey, String, Text, event, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -24,7 +24,9 @@ class Scheme(Base):
     created_by: Mapped[str] = mapped_column(
         ForeignKey("employees.id", ondelete="SET NULL"), nullable=True
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=func.now(), nullable=False
+    )
 
     plan = relationship("Plan", back_populates="schemes")
 

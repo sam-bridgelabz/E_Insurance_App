@@ -1,8 +1,9 @@
+from dotenv import load_dotenv
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from dotenv import load_dotenv
 
 load_dotenv()
+
 
 class DBSettings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -26,7 +27,7 @@ class DBSettings(BaseSettings):
             password=self.POSTGRESQL_PASSWORD,
             host=self.POSTGRESQL_SERVER,
             port=self.POSTGRESQL_PORT,
-            path=self.POSTGRESQL_DATABASE,
+            path=f"/{self.POSTGRESQL_DATABASE}",
         )
 
 
@@ -42,6 +43,7 @@ class APISettings(BaseSettings):
     HOST_PORT_NUMBER: int
     SECRET_KEY: str
 
+
 class SMTPSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -50,12 +52,13 @@ class SMTPSettings(BaseSettings):
         env_ignore_empty=True,
     )
 
-    SMTP_SERVER : str
-    SMTP_PORT : int
-    SMTP_USERNAME : str
-    SMTP_PASSWORD : str
-    BACKEND_URL : str
-    EMAIL_FROM : str
+    SMTP_SERVER: str
+    SMTP_PORT: int
+    SMTP_USERNAME: str
+    SMTP_PASSWORD: str
+    BACKEND_URL: str
+    EMAIL_FROM: str
+
 
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(

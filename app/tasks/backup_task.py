@@ -1,7 +1,9 @@
 import os
 import subprocess
 from datetime import datetime
+
 from celery import shared_task
+
 from app.config.load_config import db_settings
 
 
@@ -23,9 +25,20 @@ def backup_postgres():
 
     try:
         subprocess.run(
-            ["pg_dump", "-h", db_host, "-p", db_port, "-U", db_user, "-d",
-             db_name, "-f", filename],
-            check=True
+            [
+                "pg_dump",
+                "-h",
+                db_host,
+                "-p",
+                db_port,
+                "-U",
+                db_user,
+                "-d",
+                db_name,
+                "-f",
+                filename,
+            ],
+            check=True,
         )
         print(f"✅ Backup successful: {filename}")
     except subprocess.CalledProcessError as e:

@@ -1,16 +1,20 @@
-from pydantic import BaseModel
 from datetime import date
-from app.utils.transaction_enum import TransactionType, TransactionStatus
-from pydantic import ConfigDict
+
+from pydantic import BaseModel, ConfigDict
+
+from app.utils.transaction_enum import TransactionStatus, TransactionType
+
 
 class TransactionBase(BaseModel):
     policy_id: str
     type: TransactionType
     date: date
-    status: TransactionStatus 
+    status: TransactionStatus
+
 
 class TransactionCreate(TransactionBase):
     pass
+
 
 class TransactionResponse(TransactionBase):
     transaction_id: str

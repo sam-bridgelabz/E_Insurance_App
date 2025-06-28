@@ -1,13 +1,15 @@
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import sys
 
-from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
-from app.models import Plan, Scheme
-from app.db.session import SessionLocal
-import pandas as pd
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import matplotlib.pyplot as plt
+import pandas as pd
+from sqlalchemy import desc, func
+from sqlalchemy.orm import Session
+
+from app.db.session import SessionLocal
+from app.models import Plan, Scheme
 
 
 def plan_popularity_by_scheme_count(db: Session):
@@ -16,8 +18,7 @@ def plan_popularity_by_scheme_count(db: Session):
     """
     result = (
         db.query(
-            Plan.name.label("plan_name"),
-            func.count(Scheme.id).label("scheme_count")
+            Plan.name.label("plan_name"), func.count(Scheme.id).label("scheme_count")
         )
         .join(Scheme, Scheme.plan_id == Plan.id)
         .group_by(Plan.name)

@@ -1,12 +1,13 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, List
 
-from app.db.base import Base
-from app.utils.department_enum import DepartmentEnum
 from sqlalchemy import Date
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import ForeignKey, String, event, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import Base
+from app.utils.department_enum import DepartmentEnum
 
 if TYPE_CHECKING:
     from app.models.admin_model import Admin
@@ -19,10 +20,8 @@ class Employee(Base):
     id: Mapped[str] = mapped_column(String(20), primary_key=True, index=True)
     admin_id: Mapped[str] = mapped_column(String(20), ForeignKey("admins.id"))
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), nullable=False,
-                                       unique=True)
-    password: Mapped[str] = mapped_column(String(100), nullable=False,
-                                          unique=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     dept: Mapped[DepartmentEnum] = mapped_column(
         SQLAlchemyEnum(DepartmentEnum), nullable=False
     )

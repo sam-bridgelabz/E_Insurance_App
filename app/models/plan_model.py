@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import String, Integer, event, text
+from sqlalchemy import Integer, String, event, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -13,7 +13,9 @@ if TYPE_CHECKING:
 class Plan(Base):
     __tablename__ = "plans"
 
-    id: Mapped[str] = mapped_column(String(20), primary_key=True, nullable=False, unique=True)
+    id: Mapped[str] = mapped_column(
+        String(20), primary_key=True, nullable=False, unique=True
+    )
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     commission_floor: Mapped[int] = mapped_column(Integer, nullable=False)

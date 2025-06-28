@@ -1,6 +1,8 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, constr, Field
-from typing import Optional
 from datetime import date
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, constr
+
 
 class CustomerBase(BaseModel):
     name: str
@@ -8,9 +10,10 @@ class CustomerBase(BaseModel):
     phone_number: str
     dob: date
 
+
 class CustomerCreate(CustomerBase):
     password: str = Field(exclude=True)
-    pass
+
 
 class CustomerResponse(CustomerBase):
     id: str
@@ -18,6 +21,7 @@ class CustomerResponse(CustomerBase):
     dob: date
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class CustomerUpdate(BaseModel):
     name: Optional[str] = None
@@ -27,4 +31,3 @@ class CustomerUpdate(BaseModel):
     dob: Optional[date] = None
 
     model_config = ConfigDict(from_attributes=True)
-

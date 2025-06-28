@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
-from app.models.scheme_model import Scheme
+
 from app.models.policy_model import Policy
+from app.models.scheme_model import Scheme
+
 
 class SchemeQueries:
 
@@ -11,7 +13,8 @@ class SchemeQueries:
     @staticmethod
     def get_by_name(db: Session, name: str) -> Scheme | None:
         return db.query(Scheme).filter(Scheme.name == name).first()
-    
+
+
 class PolicyQueries:
 
     @staticmethod
@@ -20,4 +23,4 @@ class PolicyQueries:
 
     @staticmethod
     def get_by_name(db: Session, name: str) -> Policy | None:
-        return db.query(Policy).filter(Policy.name == name).first() 
+        return db.query(Policy).filter(Policy.name == name).first()

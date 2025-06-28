@@ -1,18 +1,20 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from app.auth.oauth2 import get_current_user
 from app.db.session import get_db
-from app.exceptions.orm import UnauthorizedAccess
-from app.models.policy_model import Policy
-from app.schemas.policy_schema import PolicyCreate, PolicyResponse
-from app.queries.scheme import PolicyQueries
 from app.exceptions.orm import (
-    PolicyAlreadyExists,
     ExpiryDateError,
-    ZeroAmountError,
+    PolicyAlreadyExists,
     PolicyNotFound,
+    UnauthorizedAccess,
+    ZeroAmountError,
 )
-from typing import List
+from app.models.policy_model import Policy
+from app.queries.scheme import PolicyQueries
+from app.schemas.policy_schema import PolicyCreate, PolicyResponse
 
 policy_router = APIRouter(prefix="/policy", tags=["Policy"])
 
@@ -44,7 +46,7 @@ def add_policy(
         raise ZeroAmountError()
 
     policy_data = policy.model_dump()
-    policy_data["agent_id"] = current_user["user"].id  
+    policy_data["agent_id"] = current_user["user"].id
     new_policy = Policy(**policy_data)
 
     db.add(new_policy)
